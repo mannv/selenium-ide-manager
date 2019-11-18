@@ -1,7 +1,7 @@
 {
     "name": "plum/selenium-ide-manager",
     "description": ":description",
-    "license": "MIT",
+    "license": "license",
     "authors": [
         {
             "name": "author name",

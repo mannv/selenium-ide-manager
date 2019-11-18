@@ -1,7 +1,6 @@
 <?php
-
 Route::group([
-    'middleware' => ['web'],
+    'middleware' => config('selenium_ide_manager.middleware'),
     'prefix' => 'selenium-ide-manager',
     'namespace' => 'Plum\SeleniumIdeManager\Http\Controllers'
 ], function () {
