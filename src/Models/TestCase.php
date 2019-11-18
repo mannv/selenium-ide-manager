@@ -1,0 +1,34 @@
+<?php
+
+namespace Plum\SeleniumIdeManager\Models;
+
+class TestCase extends BaseModel
+{
+    protected $table = 'sle_test_cases';
+
+    protected $fillable = ['suite_id', 'name', 'first_test_case'];
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function commands()
+    {
+        return $this->hasMany(Command::class, 'test_case_id', 'id');
+    }
+
+    public function createNewTestCase($suiteId, $name)
+    {
+        $testCase = new static();
+        $testCase->name = $name;
+        $testCase->suite_id = $suiteId;
+        $testCase->save();
+
+        return $testCase;
+    }
+
+    public function updateFirstTestCase($suiteId, $testCaseId)
+    {
+        $this->where(['suite_id' => $suiteId])->update(['first_test_case' => false]);
+        return $this->findOrFail($testCaseId)->update(['first_test_case' => true]);
+    }
+}

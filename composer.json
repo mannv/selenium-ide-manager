@@ -1,0 +1,44 @@
+{
+    "name": "plum/selenium-ide-manager",
+    "description": ":description",
+    "license": "license",
+    "authors": [
+        {
+            "name": "author name",
+            "email": "author email",
+            "homepage": "author homepage"
+        }
+    ],
+    "homepage": "https://github.com/mannv/selenium-ide-manager",
+    "keywords": ["Laravel", "SeleniumIdeManager"],
+    "require": {
+        "illuminate/support": "~5",
+        "google/apiclient": "^2.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~7.0",
+        "mockery/mockery": "^1.1",
+        "orchestra/testbench": "~3.0",
+        "sempro/phpunit-pretty-print": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Plum\\SeleniumIdeManager\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Plum\\SeleniumIdeManager\\Tests\\": "tests"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Plum\\SeleniumIdeManager\\SeleniumIdeManagerServiceProvider"
+            ],
+            "aliases": {
+                "SeleniumIdeManager": "Plum\\SeleniumIdeManager\\Facades\\SeleniumIdeManager"
+            }
+        }
+    }
+}
