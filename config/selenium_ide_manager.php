@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'storage' => env('SELENIUM_STORAGE', 'public'), //public, s3,
+    'storage' => env('SELENIUM_STOGATE', 'public'), //public, s3,
     'middleware' => ['web'],
     'google_spreadsheets_id' => '',
     'test_case_sheet_id' => '',

@@ -16,12 +16,15 @@ class Suite extends BaseModel
         return $this->hasMany(TestCase::class, 'suite_id', 'id');
     }
 
-    public function createNewSuite($name, $path = null)
+    public function createNewSuite($name, $path = null, $oldSuite = null)
     {
         $suite = new static();
         $suite->name = $name;
         $suite->ide_file_path = $path ?? 'N/A';
-        $suite->status = true;
+        $suite->status = $oldSuite['suite'] ?? true;
+        if (!empty($oldSuite['hex_color'])) {
+            $suite->hex_color = $oldSuite['hex_color'];
+        }
         $suite->save();
 
         return $suite;

@@ -16,11 +16,12 @@ class TestCase extends BaseModel
         return $this->hasMany(Command::class, 'test_case_id', 'id');
     }
 
-    public function createNewTestCase($suiteId, $name)
+    public function createNewTestCase($suiteId, $name, $defaultTestCase = false)
     {
         $testCase = new static();
         $testCase->name = $name;
         $testCase->suite_id = $suiteId;
+        $testCase->first_test_case = $defaultTestCase;
         $testCase->save();
 
         return $testCase;

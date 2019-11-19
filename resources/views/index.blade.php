@@ -14,6 +14,7 @@
                 <th>Total test case</th>
                 <th>Status</th>
                 <th>Created at</th>
+                <th>Edit</th>
                 <th>Delete</th>
             </tr>
             </thead>
@@ -52,6 +53,11 @@
                             >
                         </td>
                         <td>{{$item['created_at']}}</td>
+                        <td>
+                            <a href="{{route('selenium-ide-manager.suite.create', ['id' => $item['id']])}}">
+                                <span data-feather="upload"></span>
+                            </a>
+                        </td>
                         <td>
                             <form name="" method="POST" enctype="multipart/form-data"
                                   action="{{route('selenium-ide-manager.suite.destroy', ['id' => $item['id']])}}">

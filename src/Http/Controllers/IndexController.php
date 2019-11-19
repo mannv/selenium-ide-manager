@@ -40,7 +40,8 @@ class IndexController extends BaseController
 
     public function create()
     {
-        return view('seleniumidemanager::create');
+        $id = $this->request->get('id', 0);
+        return view('seleniumidemanager::create', ['id' => $id]);
     }
 
     private function storageSiteFile()
@@ -58,22 +59,31 @@ class IndexController extends BaseController
             return redirect()->route('selenium-ide-manager.suite.index')->with('danger', 'Please choose file .site');
         }
 
+        $oldSuite = [];
+        $suiteId = $this->request->get('id', 0);
+        if ($suiteId > 0) {
+            $oldSuite = $this->suite->getSuiteById($suiteId)->toArray();
+        }
+
         $filePath = $this->storageSiteFile();
 
         $jsonText = \File::get($this->request->file('file'));
         $json = json_decode($jsonText, true);
+        $suite = array_shift($json['suites']);
+        $defaultTestId = array_shift($suite['tests']);
 
         try {
             \DB::beginTransaction();
 
-            $suiteName = $json['suites'][0]['name'];
-            $suite = $this->suite->createNewSuite($suiteName, $filePath);
-
+            $suiteName = $suite['name'];
+            $suite = $this->suite->createNewSuite($suiteName, $filePath, $oldSuite);
 
             if (!empty($json['tests'])) {
                 foreach ($json['tests'] as $test) {
-                    $testCaste = $this->testCase->createNewTestCase($suite->id, $test['name']);
 
+                    $defaultTestCase = $defaultTestId == $test['id'];
+
+                    $testCaste = $this->testCase->createNewTestCase($suite->id, $test['name'], $defaultTestCase);
                     if (!empty($test['commands'])) {
                         foreach ($test['commands'] as $index => $item) {
                             $this->command->createNewCommand([
@@ -90,9 +100,12 @@ class IndexController extends BaseController
                     }
                 }
             }
-
-
             \DB::commit();
+
+            if ($suiteId > 0) {
+                $this->deleteSuite($suiteId);
+            }
+
         } catch (\Exception $exception) {
             \DB::rollBack();
             app('log')->error($exception);
@@ -109,11 +122,16 @@ class IndexController extends BaseController
         \Storage::disk($driver)->delete($path);
     }
 
-    public function destroy($id)
+    private function deleteSuite($id)
     {
         $suite = $this->suite->getSuiteById($id);
         $this->deleteFileSite($suite->ide_file_path);
         $suite->deleteById($id);
+    }
+
+    public function destroy($id)
+    {
+        $this->deleteSuite($id);
         return redirect()->route('selenium-ide-manager.suite.index')->with('success', 'Delete suite success');
     }
 
