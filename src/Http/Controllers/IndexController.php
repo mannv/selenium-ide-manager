@@ -80,9 +80,11 @@ class IndexController extends BaseController
 
             if (!empty($json['tests'])) {
                 foreach ($json['tests'] as $test) {
+                    if (Str::lower($test['name']) == 'config') {
+                        continue;
+                    }
 
                     $defaultTestCase = $defaultTestId == $test['id'];
-
                     $testCaste = $this->testCase->createNewTestCase($suite->id, $test['name'], $defaultTestCase);
                     if (!empty($test['commands'])) {
                         foreach ($test['commands'] as $index => $item) {
