@@ -85,8 +85,11 @@ class SyncController extends BaseController
             return redirect()->route('selenium-ide-manager.suite.index')->with('danger', 'Data not found');
         }
 
+        $credentials = config('selenium_ide_manager.google_application_credentials');
+        $randomIndex = array_rand($credentials, 1);
+
         $client = new \Google_Client();
-        putenv('GOOGLE_APPLICATION_CREDENTIALS=' . config('selenium_ide_manager.google_application_credentials'));
+        putenv('GOOGLE_APPLICATION_CREDENTIALS=' . $credentials[$randomIndex]);
         $client->useApplicationDefaultCredentials();
         $client->addScope(\Google_Service_Drive::DRIVE);
         $this->service = new \Google_Service_Sheets($client);
