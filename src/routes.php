@@ -14,8 +14,10 @@ Route::group([
             'edit'
         ]);
         Route::get('/suite/change-status/{id}', 'IndexController@changeStatus')->name('change-status');
-        Route::get('/sync/google-spreadsheets', 'SyncController@index')->name('sync.index');
         Route::put('/test-case/{id}', 'TestCaseController@update')->name('test-case.update');
-        Route::post('/test-case/change-color', 'IndexController@changeColor')->name('test-case.update');
+        Route::get('/test-case/{id}', 'TestCaseController@show')->name('test-case.show');
+        Route::get('/export', 'ExportController@index')->name('export.index');
+        Route::get('/config/{id}', 'SuiteConfigController@edit')->name('config.edit');
+        Route::put('/config/{id}', 'SuiteConfigController@update')->name('config.update');
     });
 });

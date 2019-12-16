@@ -16,6 +16,11 @@ class Suite extends BaseModel
         return $this->hasMany(TestCase::class, 'suite_id', 'id');
     }
 
+    public function configs()
+    {
+        return $this->hasMany(SuiteConfig::class, 'suite_id', 'id');
+    }
+
     public function createNewSuite($name, $path = null, $oldSuite = null)
     {
         $suite = new static();
@@ -42,12 +47,13 @@ class Suite extends BaseModel
     {
         TestCase::where(['suite_id' => $id])->delete();
         Command::where(['suite_id' => $id])->delete();
+        SuiteConfig::where(['suite_id' => $id])->delete();
         return $this->find($id)->delete();
     }
 
     public function getAll()
     {
-        return $this->with(['testCases'])->get()->toArray();
+        return $this->with(['configs', 'testCases'])->get()->toArray();
     }
 
     public function changeStatus($id, $status)
@@ -55,17 +61,18 @@ class Suite extends BaseModel
         $this->find($id)->update(['status' => !$status]);
     }
 
-    public function changeColor($id, $color)
-    {
-        $this->find($id)->update(['hex_color' => $color]);
-    }
-
     public function getAllSuite()
     {
         return $this->with([
+            'configs',
             'testCases' => function ($query) {
-                return $query->with(['commands']);
+                return $query->with([
+                    'commands' => function ($query) {
+                        return $query->select(['id', 'test_case_id', 'command', 'target', 'value'])->orderBy('weight',
+                            'ASC');
+                    }
+                ]);
             }
-        ])->get()->toArray();
+        ])->where(['status' => true])->get()->toArray();
     }
 }

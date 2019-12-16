@@ -13,7 +13,12 @@ class TestCase extends BaseModel
      */
     public function commands()
     {
-        return $this->hasMany(Command::class, 'test_case_id', 'id');
+        return $this->hasMany(Command::class, 'test_case_id', 'id')->orderBy('weight', 'ASC');
+    }
+
+    public function suite()
+    {
+        return $this->hasOne(Suite::class, 'id', 'suite_id');
     }
 
     public function createNewTestCase($suiteId, $name, $defaultTestCase = false)
@@ -31,5 +36,10 @@ class TestCase extends BaseModel
     {
         $this->where(['suite_id' => $suiteId])->update(['first_test_case' => false]);
         return $this->findOrFail($testCaseId)->update(['first_test_case' => true]);
+    }
+
+    public function getById($id)
+    {
+        return self::with(['suite', 'commands'])->findOrFail($id);
     }
 }

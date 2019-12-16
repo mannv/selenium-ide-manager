@@ -150,47 +150,50 @@ $arr = explode('.', $routeName);
 $name = array_pop($arr);
 ?>
 
+<h1>{{$routeName}}</h1>
 <div class="container-fluid">
-    <div class="row">
-        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
-            <div class="sidebar-sticky">
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link {{$name == 'index' ? 'active' : ''}}"
-                           href="{{route('selenium-ide-manager.suite.index')}}">
-                            <span data-feather="list"></span> Suites
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{$name == 'create' ? 'active' : ''}}"
-                           href="{{route('selenium-ide-manager.suite.create')}}">
-                            <span data-feather="plus"></span>
-                            Add suite
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link"
-                           href="{{route('selenium-ide-manager.sync.index')}}">
-                            <span data-feather="upload-cloud"></span>
-                            Sync to spreadsheets
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" target="_blank"
-                           href="https://docs.google.com/spreadsheets/d/{{config('selenium_ide_manager.google_spreadsheets_id')}}">
-                            <span data-feather="file-text"></span>
-                            Spreadsheets
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
+    @if($routeName == 'selenium-ide-manager.config.edit')
+        <div class="row">
+            <main role="main" class="col-md-12 ml-sm-auto col-lg-12">
+                @include('seleniumidemanager::alert')
+                @yield('content')
+            </main>
+        </div>
+    @else
+        <div class="row">
+            <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+                <div class="sidebar-sticky">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link {{$name == 'index' ? 'active' : ''}}"
+                               href="{{route('selenium-ide-manager.suite.index')}}">
+                                <span data-feather="list"></span> Suites
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{$name == 'create' ? 'active' : ''}}"
+                               href="{{route('selenium-ide-manager.suite.create')}}">
+                                <span data-feather="plus"></span>
+                                Add suite
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               href="{{route('selenium-ide-manager.export.index')}}">
+                                <span data-feather="upload-cloud"></span>
+                                Export JSON
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
 
-        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
-            @include('seleniumidemanager::alert')
-            @yield('content')
-        </main>
-    </div>
+            <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+                @include('seleniumidemanager::alert')
+                @yield('content')
+            </main>
+        </div>
+    @endif
 </div>
 <script
     src="https://code.jquery.com/jquery-3.4.1.min.js"

@@ -2,7 +2,8 @@
     <ol>
         @foreach($testCases as $testCase)
             <li>
-                {{$suite['name']}}_{{$testCase['name']}}
+                <a target="_blank"
+                   href="{{route('selenium-ide-manager.test-case.show', ['id' => $testCase['id']])}}">{{$testCase['name']}}</a>
                 @if($testCase['first_test_case'])
                     <span class="text-success" data-feather="check"></span>
                 @else

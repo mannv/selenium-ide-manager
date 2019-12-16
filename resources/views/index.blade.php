@@ -10,7 +10,7 @@
             <tr>
                 <th>#</th>
                 <th>Suite name</th>
-                <th>Suite color</th>
+                <th>Suite config</th>
                 <th>Total test case</th>
                 <th>Status</th>
                 <th>Created at</th>
@@ -30,13 +30,15 @@
                             {{$item['name']}}
                         </td>
                         <td>
-                            <div class="colorSelector" data-hex="{{$item['hex_color']}}">
-                                <div style="background-color: #{{$item['hex_color']}}"></div>
-                            </div>
-                            <a data-id="{{$item['id']}}"
-                               data-hex="{{$item['hex_color']}}"
-                               style="cursor: pointer; display: none"
-                               class="save-color text-primary">Save</a>
+                            @if($item['configs_count'] > 0)
+                                Có <strong>{{$item['configs_rows']}}</strong> cấu hình, mỗi cấu hình có
+                                <strong>{{$item['configs_count']}}</strong> tham số
+                                <a target="_blank" href="{{route('selenium-ide-manager.config.edit', ['id' => $item['id']])}}">
+                                    <span data-feather="edit"></span>
+                                </a>
+                            @else
+                                Không có cấu hình
+                            @endif
                         </td>
                         <td class="col-test-case">
                             @include('seleniumidemanager::test_case', ['testCases' => $item['test_cases'], 'suite' => $item])
@@ -76,32 +78,11 @@
 @push('style')
     <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css"
           rel="stylesheet">
-    <link href="{{asset('vendor/plum/colorpicker/css/colorpicker.css')}}" rel="stylesheet">
-    <style type="text/css">
-        .colorSelector {
-            position: relative;
-            width: 36px;
-            height: 36px;
-            background: url({{asset('vendor/plum/colorpicker/images/select.png')}});
-            display: inline-flex;
-        }
-
-        .colorSelector div {
-            position: absolute;
-            top: 3px;
-            left: 3px;
-            width: 30px;
-            height: 30px;
-            background: url({{asset('vendor/plum/colorpicker/images/select.png')}}) center;
-        }
-    </style>
 @endpush
 @push('script')
     <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
     <script
         src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.6/dist/loadingoverlay.min.js"></script>
-
-    <script src="{{asset('vendor/plum/colorpicker/js/colorpicker.js')}}"></script>
     <script type="text/javascript">
 
         $(function () {
@@ -109,52 +90,6 @@
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
-            });
-
-            $('.colorSelector').ColorPicker({
-                onBeforeShow: function () {
-                    let hex = $(this).data('hex');
-                    $(this).ColorPickerSetColor(hex);
-                    $(this).find('div').css('backgroundColor', '#' + hex);
-                },
-                onShow: function (colpkr) {
-                    $(colpkr).fadeIn(500);
-                    return false;
-                },
-                onHide: function (colpkr) {
-                    $(colpkr).fadeOut(500);
-                    return false;
-                },
-                onChange: function (hsb, hex, rgb, el) {
-                    $(el).find('div').css('backgroundColor', '#' + hex);
-                    $(el).attr('data-hex', hex);
-                    $(el).next().attr('data-hex', hex);
-                    $(el).next().show();
-                }
-            });
-
-            $('.save-color').click(function () {
-                let hex = $(this).data('hex');
-                let suiteId = $(this).data('id');
-                let self = $(this);
-                $.ajax({
-                    type: 'POST',
-                    url: `/selenium-ide-manager/test-case/change-color`,
-                    data: {
-                        id: suiteId,
-                        hex_color: hex
-                    },
-                    success: function (data) {
-                        console.log(data);
-                        $(self).hide();
-                    },
-                    beforeSend: function () {
-                        $.LoadingOverlay("show");
-                    },
-                    complete: function () {
-                        $.LoadingOverlay("hide");
-                    },
-                })
             });
 
             $('.switch-button').change(function () {

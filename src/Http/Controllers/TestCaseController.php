@@ -33,4 +33,10 @@ class TestCaseController extends BaseController
         $html = \View::make('seleniumidemanager::test_case', ['testCases' => $suite['test_cases'], 'suite' => $suite]);
         return $html;
     }
+
+    public function show($id)
+    {
+        $testCase = $this->testCase->getById($id);
+        return view('seleniumidemanager::test_case_show', ['data' => $testCase]);
+    }
 }

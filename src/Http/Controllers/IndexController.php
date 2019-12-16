@@ -5,6 +5,7 @@ namespace Plum\SeleniumIdeManager\Http\Controllers;
 use Illuminate\Support\Str;
 use Plum\SeleniumIdeManager\Models\Command;
 use Plum\SeleniumIdeManager\Models\Suite;
+use Plum\SeleniumIdeManager\Models\SuiteConfig;
 use Plum\SeleniumIdeManager\Models\TestCase;
 
 class IndexController extends BaseController
@@ -24,17 +25,32 @@ class IndexController extends BaseController
      */
     private $command;
 
-    public function __construct(Suite $suite, TestCase $testCase, Command $command)
+    /**
+     * @var SuiteConfig
+     */
+    private $suiteConfig;
+
+    public function __construct(Suite $suite, TestCase $testCase, Command $command, SuiteConfig $suiteConfig)
     {
         parent::__construct();
         $this->suite = $suite;
         $this->testCase = $testCase;
         $this->command = $command;
+        $this->suiteConfig = $suiteConfig;
     }
 
     public function index()
     {
         $result = $this->suite->getAll();
+        if (!empty($result)) {
+            $result = collect($result)->map(function ($item) {
+                $values = json_decode($item['configs'][0]['variable_value'], true);
+                $item['configs_count'] = count($item['configs']);
+                $item['configs_rows'] = count($values);
+                unset($item['configs']);
+                return $item;
+            })->all();
+        }
         return view('seleniumidemanager::index', ['data' => $result]);
     }
 
@@ -81,6 +97,7 @@ class IndexController extends BaseController
             if (!empty($json['tests'])) {
                 foreach ($json['tests'] as $test) {
                     if (Str::lower($test['name']) == 'config') {
+                        $this->makeSuiteConfig($suite->id, $test);
                         continue;
                     }
 
@@ -115,6 +132,19 @@ class IndexController extends BaseController
         return redirect()->route('selenium-ide-manager.suite.index')->with('success', 'Import suite success');
     }
 
+    private function makeSuiteConfig($suiteId, $test)
+    {
+        if (empty($test['commands'])) {
+            return;
+        }
+        foreach ($test['commands'] as $item) {
+            if ($item['command'] != 'store') {
+                continue;
+            }
+            $this->suiteConfig->createNewSuiteConfig($suiteId, $item['value'], json_encode([$item['target']]));
+        }
+    }
+
     private function deleteFileSite($url)
     {
         $driver = config('selenium_ide_manager.storage');
@@ -141,12 +171,5 @@ class IndexController extends BaseController
     {
         $suite = $this->suite->getSuiteById($id);
         return $this->suite->changeStatus($id, $suite->status);
-    }
-
-    public function changeColor()
-    {
-        $suiteId = $this->request->get('id');
-        $color = $this->request->get('hex_color');
-        return $this->suite->changeColor($suiteId, $color);
     }
 }
