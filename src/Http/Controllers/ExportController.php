@@ -35,8 +35,6 @@ class ExportController extends BaseController
                 'test_case' => $testCases
             ];
         }
-        echo '<pre>' . print_r($data, true) . '</pre>';
-        die;
 
         $filePath = storage_path('app/test_case.json');
         \File::put($filePath, json_encode($data));
