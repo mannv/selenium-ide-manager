@@ -35,6 +35,8 @@ class ExportController extends BaseController
                 'test_case' => $testCases
             ];
         }
+        echo '<pre>' . print_r($data, true) . '</pre>';
+        die;
 
         $filePath = storage_path('app/test_case.json');
         \File::put($filePath, json_encode($data));
@@ -64,19 +66,28 @@ class ExportController extends BaseController
         return $listTestCase;
     }
 
+    private function getHostOfDomain($replaceDomain)
+    {
+        $arr = parse_url($replaceDomain);
+        return $arr['host'];
+    }
+
     private function filterDomain($url)
     {
-        $replaceDomain = config('app.domain.frontend');
-        $arr = parse_url($replaceDomain);
-        $replaceDomain = $arr['host'];
-
-
-        $domains = ['local.vitop-career.com', 'test.vitop-career.com', 'vitop.vn'];
-        foreach ($domains as $domain) {
-            if (Str::contains($url, $domain)) {
-                $url = Str::replaceFirst($domain, $replaceDomain, $url);
-            }
+        $listDomain = [];
+        $replaceDomain = $this->getHostOfDomain(config('app.domain.frontend'));
+        $frontendDomain = config('selenium_ide_manager.replace_domain.frontend');
+        foreach ($frontendDomain as $item) {
+            $listDomain['://' . $item] = '://' . $replaceDomain;
         }
+
+        $replaceDomain = $this->getHostOfDomain(config('app.domain.backend'));
+        $backendDomain = config('selenium_ide_manager.replace_domain.backend');
+        foreach ($backendDomain as $item) {
+            $listDomain['://' . $item] = '://' . $replaceDomain;
+        }
+
+        $url = str_replace(array_keys($listDomain), $listDomain, $url);
         $url = Str::replaceFirst('http://', 'https://', $url);
         return $url;
     }
